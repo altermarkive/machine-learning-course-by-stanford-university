@@ -227,13 +227,16 @@ def ex1():
 
     # Using sklearn
     X = np.reshape(data[:, 0], (data.shape[0], 1))
-    regr = linear_model.LinearRegression()
-    regr.fit(X, y)
+    #model = linear_model.LinearRegression()
+    model = linear_model.Ridge(alpha=alpha, max_iter=iterations, solver='lsqr')
+    model.fit(X, y)
+    print('Theta found: ')
+    print('%f %f ' % (model.intercept_[0], model.coef_[0, 0]))
     fig = plt.figure()
     plt.plot(X, y, 'rx', markersize=10)
     plt.ylabel('Profit in $10,000s')
     plt.xlabel('Population of City in 10,000s')
-    plt.plot(X, regr.predict(X), '-')
+    plt.plot(X, model.predict(X), '-')
     plt.legend(['Training data', 'Linear regression'])
     plt.savefig('figure2.sklearn.png')
 
