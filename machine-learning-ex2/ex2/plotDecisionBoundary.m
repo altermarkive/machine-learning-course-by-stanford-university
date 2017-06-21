@@ -43,6 +43,7 @@ else
     % Notice you need to specify the range [0, 0]
     contour(u, v, z, [0, 0], 'LineWidth', 2)
 end
+saveas(gcf,'figure2.jpg')
 hold off
 
 end
