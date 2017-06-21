@@ -64,7 +64,7 @@ def submitParts(conf, email, token, parts_):
     body = makePostBody(conf, email, token, parts_)
     submissionUrl_ = submissionUrl()
     params = {'jsonBody': body}
-    print(json.dumps(params).encode('utf-8'))
+    print(body)
     responseBody = urllib.request.urlopen(urllib.request.Request(submissionUrl_, method='POST', data=json.dumps(params).encode('utf-8')))
     responseBody = responseBody.read().decode('utf-8')
     response = json.loads(responseBody)
