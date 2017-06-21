@@ -1,49 +1,57 @@
-function plotDecisionBoundary(theta, X, y)
-%PLOTDECISIONBOUNDARY Plots the data points X and y into a new figure with
-%the decision boundary defined by theta
-%   PLOTDECISIONBOUNDARY(theta, X,y) plots the data points with + for the 
-%   positive examples and o for the negative examples. X is assumed to be 
-%   a either 
-%   1) Mx3 matrix, where the first column is an all-ones column for the 
-%      intercept.
-%   2) MxN, N>3 matrix, where the first column is all-ones
+#!/usr/bin/env python3
 
-% Plot Data
-plotData(X(:,2:3), y);
-hold on
+import numpy as np
+import matplotlib
+# Force matplotlib to not use any X Windows backend (must be called befor importing pyplot)
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
-if size(X, 2) <= 3
-    % Only need 2 points to define a line, so choose two endpoints
-    plot_x = [min(X(:,2))-2,  max(X(:,2))+2];
+from mapFeature import mapFeature
+from plotData import plotData
 
-    % Calculate the decision boundary line
-    plot_y = (-1./theta(3)).*(theta(2).*plot_x + theta(1));
 
-    % Plot, and adjust axes for better viewing
-    plot(plot_x, plot_y)
-    
-    % Legend, specific for the exercise
-    legend('Admitted', 'Not admitted', 'Decision Boundary')
-    axis([30, 100, 30, 100])
-else
-    % Here is the grid range
-    u = linspace(-1, 1.5, 50);
-    v = linspace(-1, 1.5, 50);
+def plotDecisionBoundary(theta, X, y, labels):
+    #PLOTDECISIONBOUNDARY Plots the data points X and y into a new figure with
+    #the decision boundary defined by theta
+    #   PLOTDECISIONBOUNDARY(theta, X,y) plots the data points with + for the
+    #   positive examples and o for the negative examples. X is assumed to be
+    #   a either
+    #   1) Mx3 matrix, where the first column is an all-ones column for the
+    #      intercept.
+    #   2) MxN, N>3 matrix, where the first column is all-ones
 
-    z = zeros(length(u), length(v));
-    % Evaluate z = theta*x over the grid
-    for i = 1:length(u)
-        for j = 1:length(v)
-            z(i,j) = mapFeature(u(i), v(j))*theta;
-        end
-    end
-    z = z'; % important to transpose z before calling contour
+    # Plot Data
+    pos_handle, neg_handle = plotData(X[:, 1:3], y, labels)
+    #hold on
 
-    % Plot z = 0
-    % Notice you need to specify the range [0, 0]
-    contour(u, v, z, [0, 0], 'LineWidth', 2)
-end
-saveas(gcf,'figure2.jpg')
-hold off
+    if X.shape[1] <= 3:
+        # Only need 2 points to define a line, so choose two endpoints
+        plot_x = [np.min(X[:, 1]) - 2, np.max(X[:, 1]) + 2]
 
-end
+        # Calculate the decision boundary line
+        plot_y = np.dot((-1.0 / theta[2]), (np.dot(theta[1], plot_x) + theta[0]))
+
+        # Plot, and adjust axes for better viewing
+        boundary_handle = plt.plot(plot_x, plot_y, label='Decision Boundary')[0]
+
+        # Legend, specific for the exercise
+        #axis([30, 100, 30, 100])
+    else:
+        # Here is the grid range
+        u = np.linspace(-1, 1.5, 50)
+        v = np.linspace(-1, 1.5, 50)
+
+        z = np.zeros((u.size, v.size))
+        # Evaluate z = theta*x over the grid
+        for i in range(u.size):
+            for j in range(v.size):
+                z[i, j] = np.dot(mapFeature(np.array([u[i]]), np.array([v[j]])), theta)
+        z = z.T # important to transpose z before calling contour
+
+        # Plot z = 0
+        # Notice you need to specify the range [0, 0]
+        u, v = np.meshgrid(u, v)
+        boundary_handle = plt.contour(u, v, z, [0], linewidth=2).collections[0]
+        boundary_handle.set_label('Decision Boundary')
+    #hold off
+    return (pos_handle, neg_handle, boundary_handle)
