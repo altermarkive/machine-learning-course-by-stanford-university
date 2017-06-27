@@ -1,54 +1,49 @@
-function pred = svmPredict(model, X)
-%SVMPREDICT returns a vector of predictions using a trained SVM model
-%(svmTrain). 
-%   pred = SVMPREDICT(model, X) returns a vector of predictions using a 
-%   trained SVM model (svmTrain). X is a mxn matrix where there each 
-%   example is a row. model is a svm model returned from svmTrain.
-%   predictions pred is a m x 1 column of predictions of {0, 1} values.
-%
+#!/usr/bin/env python3
 
-% Check if we are getting a column vector, if so, then assume that we only
-% need to do prediction for a single example
-if (size(X, 2) == 1)
-    % Examples should be in rows
-    X = X';
-end
+import numpy as np
 
-% Dataset 
-m = size(X, 1);
-p = zeros(m, 1);
-pred = zeros(m, 1);
 
-if strcmp(func2str(model.kernelFunction), 'linearKernel')
-    % We can use the weights and bias directly if working with the 
-    % linear kernel
-    p = X * model.w + model.b;
-elseif strfind(func2str(model.kernelFunction), 'gaussianKernel')
-    % Vectorized RBF Kernel
-    % This is equivalent to computing the kernel on every pair of examples
-    X1 = sum(X.^2, 2);
-    X2 = sum(model.X.^2, 2)';
-    K = bsxfun(@plus, X1, bsxfun(@plus, X2, - 2 * X * model.X'));
-    K = model.kernelFunction(1, 0) .^ K;
-    K = bsxfun(@times, model.y', K);
-    K = bsxfun(@times, model.alphas', K);
-    p = sum(K, 2);
-else
-    % Other Non-linear kernel
-    for i = 1:m
-        prediction = 0;
-        for j = 1:size(model.X, 1)
-            prediction = prediction + ...
-                model.alphas(j) * model.y(j) * ...
-                model.kernelFunction(X(i,:)', model.X(j,:)');
-        end
-        p(i) = prediction + model.b;
-    end
-end
+def svmPredict(model, X):
+    #SVMPREDICT returns a vector of predictions using a trained SVM model
+    #(svmTrain). 
+    #   pred = SVMPREDICT(model, X) returns a vector of predictions using a 
+    #   trained SVM model (svmTrain). X is a mxn matrix where there each 
+    #   example is a row. model is a svm model returned from svmTrain.
+    #   predictions pred is a m x 1 column of predictions of {0, 1} values.
+    #
 
-% Convert predictions into 0 / 1
-pred(p >= 0) =  1;
-pred(p <  0) =  0;
+    # check if we are getting a vector. If so, then assume we only need to do predictions
+    # for a single example
+    if X.ndim == 1:
+        X = X[np.newaxis, :]
 
-end
+    m = X.shape[0]
+    p = np.zeros(m)
+    pred = np.zeros(m)
 
+    if model['kernelFunction'].__name__ == 'linearKernel':
+        # we can use the weights and bias directly if working with the linear kernel
+        p = np.dot(X, model['w']) + model['b']
+    elif model['kernelFunction'].__name__ == 'gaussianKernel':
+        # vectorized RBF Kernel
+        # This is equivalent to computing the kernel on every pair of examples
+        X1 = np.sum(X**2, 1)
+        X2 = np.sum(model['X']**2, 1)
+        K = X2 + X1[:, None] - 2 * np.dot(X, model['X'].T)
+
+        if len(model['args']) > 0:
+            K /= 2*model['args'][0]**2
+
+        K = np.exp(-K)
+        p = np.dot(K, model['alphas']*model['y']) + model['b']
+    else:
+        # other non-linear kernel
+        for i in range(m):
+            predictions = 0
+            for j in range(model['X'].shape[0]):
+                predictions += model['alphas'][j] * model['y'][j] \
+                               * model['kernelFunction'](X[i, :], model['X'][j, :])
+            p[i] = predictions
+
+    pred[p >= 0] = 1
+    return pred

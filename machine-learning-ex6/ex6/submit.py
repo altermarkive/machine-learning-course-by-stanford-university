@@ -1,55 +1,69 @@
-function submit()
-  addpath('./lib');
+#!/usr/bin/env python3
 
-  conf.assignmentSlug = 'support-vector-machines';
-  conf.itemName = 'Support Vector Machines';
-  conf.partArrays = { ...
-    { ...
-      '1', ...
-      { 'gaussianKernel.m' }, ...
-      'Gaussian Kernel', ...
-    }, ...
-    { ...
-      '2', ...
-      { 'dataset3Params.m' }, ...
-      'Parameters (C, sigma) for Dataset 3', ...
-    }, ...
-    { ...
-      '3', ...
-      { 'processEmail.m' }, ...
-      'Email Preprocessing', ...
-    }, ...
-    { ...
-      '4', ...
-      { 'emailFeatures.m' }, ...
-      'Email Feature Extraction', ...
-    }, ...
-  };
-  conf.output = @output;
+import numpy as np
+import scipy.io
 
-  submitWithConfiguration(conf);
-end
+from lib.submitWithConfiguration import submitWithConfiguration, formatter
+from gaussianKernel import gaussianKernel
+from dataset3Params import dataset3Params
+from processEmail import processEmail
+from emailFeatures import emailFeatures
 
-function out = output(partId, auxstring)
-  % Random Test Cases
-  x1 = sin(1:10)';
-  x2 = cos(1:10)';
-  ec = 'the quick brown fox jumped over the lazy dog';
-  wi = 1 + abs(round(x1 * 1863));
-  wi = [wi ; wi];
-  if partId == '1'
-    sim = gaussianKernel(x1, x2, 2);
-    out = sprintf('%0.5f ', sim);
-  elseif partId == '2'
-    load('ex6data3.mat');
-    [C, sigma] = dataset3Params(X, y, Xval, yval);
-    out = sprintf('%0.5f ', C);
-    out = [out sprintf('%0.5f ', sigma)];
-  elseif partId == '3'
-    word_indices = processEmail(ec);
-    out = sprintf('%d ', word_indices);
-  elseif partId == '4'
-    x = emailFeatures(wi);
-    out = sprintf('%d ', x);
-  end 
-end
+
+def submit():
+    conf = {}
+    conf['assignmentSlug'] = 'support-vector-machines'
+    conf['itemName'] = 'Support Vector Machines'
+    conf['partArrays'] = [
+        [
+            '1',
+            ['gaussianKernel.m'],
+            'Gaussian Kernel',
+        ],
+        [
+            '2',
+            ['dataset3Params.m'],
+            'Parameters (C, sigma) for Dataset 3',
+        ],
+        [
+            '3',
+            ['processEmail.m'],
+            'Email Preprocessing',
+        ],
+        [
+            '4',
+            ['emailFeatures.m'],
+            'Email Feature Extraction',
+        ],
+    ]
+    conf['output'] = output
+
+    submitWithConfiguration(conf)
+
+
+def output(partId):
+    # Random Test Cases
+    x1 = np.sin(np.arange(1, 11))
+    x2 = np.cos(np.arange(1, 11))
+    ec = 'the quick brown fox jumped over the lazy dog'
+    wi = np.abs(np.round(x1 * 1863)).astype(int)
+    wi = np.concatenate([wi, wi])
+    if partId == '1':
+        sim = gaussianKernel(x1, x2, 2)
+        out = formatter('%0.5f ', sim)
+    elif partId == '2':
+        mat = scipy.io.loadmat('ex6data3.mat')
+        X = mat['X']
+        y = mat['y'].ravel()
+        Xval = mat['Xval']
+        yval = mat['yval'].ravel()
+        C, sigma = dataset3Params(X, y, Xval, yval)
+        out = formatter('%0.5f ', C)
+        out += formatter('%0.5f ', sigma)
+    elif partId == '3':
+        word_indices = processEmail(ec) + 1
+        out = formatter('%d ', word_indices)
+    elif partId == '4':
+        x = emailFeatures(wi)
+        out = formatter('%d ', x)
+    return out
