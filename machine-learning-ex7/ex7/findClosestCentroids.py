@@ -1,38 +1,42 @@
-function idx = findClosestCentroids(X, centroids)
-%FINDCLOSESTCENTROIDS computes the centroid memberships for every example
-%   idx = FINDCLOSESTCENTROIDS (X, centroids) returns the closest centroids
-%   in idx for a dataset X where each row is a single example. idx = m x 1 
-%   vector of centroid assignments (i.e. each entry in range [1..K])
-%
+#!/usr/bin/env python3
 
-% Set K
-K = size(centroids, 1);
-
-% You need to return the following variables correctly.
-idx = zeros(size(X,1), 1);
-
-% ====================== YOUR CODE HERE ======================
-% Instructions: Go over every example, find its closest centroid, and store
-%               the index inside idx at the appropriate location.
-%               Concretely, idx(i) should contain the index of the centroid
-%               closest to example i. Hence, it should be a value in the 
-%               range 1..K
-%
-% Note: You can use a for-loop over the examples to compute this.
-%
-
-k_ones = ones(K, 1);
-for i = 1:size(X, 1)
-    [~, index] = min(sum((k_ones * X(i, :) - centroids) .^ 2, 2));
-    idx(i) = index;
-end
+import numpy as np
 
 
+def findClosestCentroids(X, centroids):
+    #FINDCLOSESTCENTROIDS computes the centroid memberships for every example
+    #   idx = FINDCLOSESTCENTROIDS (X, centroids) returns the closest centroids
+    #   in idx for a dataset X where each row is a single example. idx = m x 1 
+    #   vector of centroid assignments (i.e. each entry in range [1..K])
+    #
+
+    # Set K
+    K = centroids.shape[0]
+
+    # You need to return the following variables correctly.
+    idx = np.zeros(X.shape[0], dtype=int)
+
+    # ====================== YOUR CODE HERE ======================
+    # Instructions: Go over every example, find its closest centroid, and store
+    #               the index inside idx at the appropriate location.
+    #               Concretely, idx(i) should contain the index of the centroid
+    #               closest to example i. Hence, it should be a value in the 
+    #               range 1..K
+    #
+    # Note: You can use a for-loop over the examples to compute this.
+    #
+
+    for i in range(X.shape[0]):
+        idx[i] = np.argmin(np.sum(np.square(X[i] - centroids), axis=1))
+    #end
 
 
 
 
-% =============================================================
 
-end
+
+    # =============================================================
+
+    return idx
+    #end
 
