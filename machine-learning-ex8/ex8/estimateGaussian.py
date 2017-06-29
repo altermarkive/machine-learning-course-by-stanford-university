@@ -1,30 +1,33 @@
-function [mu sigma2] = estimateGaussian(X)
-%ESTIMATEGAUSSIAN This function estimates the parameters of a 
-%Gaussian distribution using the data in X
-%   [mu sigma2] = estimateGaussian(X), 
-%   The input X is the dataset with each n-dimensional data point in one row
-%   The output is an n-dimensional vector mu, the mean of the data set
-%   and the variances sigma^2, an n x 1 vector
-% 
+#!/usr/bin/env python3
 
-% Useful variables
-[m, n] = size(X);
-
-% You should return these values correctly
-%mu = zeros(n, 1);
-%sigma2 = zeros(n, 1);
-
-% ====================== YOUR CODE HERE ======================
-% Instructions: Compute the mean of the data and the variances
-%               In particular, mu(i) should contain the mean of
-%               the data for the i-th feature and sigma2(i)
-%               should contain variance of the i-th feature.
-%
-
-mu = mean(X)';
-sigma2 = (std(X) .^ 2)' .* (m - 1) ./ m; % var(X)' .* (m - 1) ./ m;
+import numpy as np
 
 
+def estimateGaussian(X):
+    #ESTIMATEGAUSSIAN This function estimates the parameters of a 
+    #Gaussian distribution using the data in X
+    #   [mu sigma2] = estimateGaussian(X), 
+    #   The input X is the dataset with each n-dimensional data point in one row
+    #   The output is an n-dimensional vector mu, the mean of the data set
+    #   and the variances sigma^2, an n x 1 vector
+    # 
+
+    # Useful variables
+    m, n = X.shape
+
+    # You should return these values correctly
+    #mu = zeros(n, 1)
+    #sigma2 = zeros(n, 1)
+
+    # ====================== YOUR CODE HERE ======================
+    # Instructions: Compute the mean of the data and the variances
+    #               In particular, mu(i) should contain the mean of
+    #               the data for the i-th feature and sigma2(i)
+    #               should contain variance of the i-th feature.
+    #
+
+    mu = np.mean(X, axis=0).T
+    sigma2 = (np.std(X, axis=0, ddof=1) ** 2).T * (m - 1) / m
 
 
 
@@ -32,7 +35,10 @@ sigma2 = (std(X) .^ 2)' .* (m - 1) ./ m; % var(X)' .* (m - 1) ./ m;
 
 
 
-% =============================================================
 
 
-end
+    # =============================================================
+
+
+    return (mu, sigma2)
+    #end
