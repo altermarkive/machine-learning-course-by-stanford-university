@@ -1,48 +1,45 @@
-function checkCostFunction(lambda)
-%CHECKCOSTFUNCTION Creates a collaborative filering problem 
-%to check your cost function and gradients
-%   CHECKCOSTFUNCTION(lambda) Creates a collaborative filering problem 
-%   to check your cost function and gradients, it will output the 
-%   analytical gradients produced by your code and the numerical gradients 
-%   (computed using computeNumericalGradient). These two gradient 
-%   computations should result in very similar values.
+#!/usr/bin/env python3
 
-% Set lambda
-if ~exist('lambda', 'var') || isempty(lambda)
-    lambda = 0;
-end
+import numpy as np
 
-%% Create small problem
-X_t = rand(4, 3);
-Theta_t = rand(5, 3);
+from computeNumericalGradient import computeNumericalGradient
+from cofiCostFunc import cofiCostFunc
 
-% Zap out most entries
-Y = X_t * Theta_t';
-Y(rand(size(Y)) > 0.5) = 0;
-R = zeros(size(Y));
-R(Y ~= 0) = 1;
 
-%% Run Gradient Checking
-X = randn(size(X_t));
-Theta = randn(size(Theta_t));
-num_users = size(Y, 2);
-num_movies = size(Y, 1);
-num_features = size(Theta_t, 2);
+def checkCostFunction(lambda_value=0):
+    #CHECKCOSTFUNCTION Creates a collaborative filering problem 
+    #to check your cost function and gradients
+    #   CHECKCOSTFUNCTION(lambda) Creates a collaborative filering problem 
+    #   to check your cost function and gradients, it will output the 
+    #   analytical gradients produced by your code and the numerical gradients 
+    #   (computed using computeNumericalGradient). These two gradient 
+    #   computations should result in very similar values.
 
-numgrad = computeNumericalGradient( ...
-                @(t) cofiCostFunc(t, Y, R, num_users, num_movies, ...
-                                num_features, lambda), [X(:); Theta(:)]);
+    ## Create small problem
+    X_t = np.random.rand(4, 3)
+    Theta_t = np.random.rand(5, 3)
 
-[cost, grad] = cofiCostFunc([X(:); Theta(:)],  Y, R, num_users, ...
-                          num_movies, num_features, lambda);
+    # Zap out most entries
+    Y = np.dot(X_t, Theta_t.T)
+    Y[np.random.rand(*Y.shape) > 0.5] = 0
+    R = np.zeros(Y.shape)
+    R[Y != 0] = 1
 
-disp([numgrad grad]);
-fprintf(['The above two columns you get should be very similar.\n' ...
-         '(Left-Your Numerical Gradient, Right-Analytical Gradient)\n\n']);
+    ## Run Gradient Checking
+    X = np.random.randn(*X_t.shape)
+    Theta = np.random.randn(*Theta_t.shape)
+    num_movies, num_users = Y.shape
+    num_features = Theta_t.shape[1]
 
-diff = norm(numgrad-grad)/norm(numgrad+grad);
-fprintf(['If your backpropagation implementation is correct, then \n' ...
-         'the relative difference will be small (less than 1e-9). \n' ...
-         '\nRelative Difference: %g\n'], diff);
+    numgrad = computeNumericalGradient(
+        lambda x: cofiCostFunc(x, Y, R, num_users, num_movies, num_features, lambda_value), np.concatenate([X.ravel(), Theta.ravel()]))
 
-end
+    cost, grad = cofiCostFunc(np.concatenate([X.ravel(), Theta.ravel()]), Y, R, num_users, num_movies, num_features, lambda_value)
+
+    print(np.stack([numgrad, grad], axis=1))
+    print('The above two columns you get should be very similar.\n(Left-Your Numerical Gradient, Right-Analytical Gradient)\n')
+
+    diff = np.linalg.norm(numgrad - grad) / np.linalg.norm(numgrad + grad)
+    print('If your cost function implementation is correct, then \nthe relative difference will be small (less than 1e-9).\nRelative Difference: %g' % diff)
+
+    #end
