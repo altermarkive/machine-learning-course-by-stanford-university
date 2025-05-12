@@ -6,7 +6,9 @@ import matplotlib.cm as cm
 # Force matplotlib to not use any X Windows backend (must be called befor importing pyplot)
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+import mpl_toolkits.mplot3d
+import sklearn.linear_model as linear_model
+
 
 def warmUpExercise():
     #WARMUPEXERCISE Example function in octave
@@ -222,6 +224,18 @@ def ex1():
     #hold on;
     plt.plot(theta[0, 0], theta[1, 0], 'rx', markersize=10, linewidth=2)
     plt.savefig('figure4.png')
+
+    # Using sklearn
+    X = np.reshape(data[:, 0], (data.shape[0], 1))
+    regr = linear_model.LinearRegression()
+    regr.fit(X, y)
+    fig = plt.figure()
+    plt.plot(X, y, 'rx', markersize=10)
+    plt.ylabel('Profit in $10,000s')
+    plt.xlabel('Population of City in 10,000s')
+    plt.plot(X, regr.predict(X), '-')
+    plt.legend(['Training data', 'Linear regression'])
+    plt.savefig('figure2.sklearn.png')
 
 if __name__ == "__main__":
     ex1()
