@@ -62,9 +62,42 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+% Feed forward
+a1 = [ones(m, 1) X];
+z2 = a1 * Theta1';
+a2 = sigmoid(z2);
+a2 = [ones(m, 1) a2];
+z3 = a2 * Theta2';
+h = sigmoid(z3);
 
+% Main term of the cost function
+for k = 1:num_labels
+    yk = y == k;
+    hk = h(:, k);
+    Jk = sum(-yk .* log(hk) - (1 - yk) .* log(1 - hk)) / m;
+    J = J + Jk;
+end
 
+% Regularization term of the cost function
+J = J + lambda * (sum(sum(Theta1(:, 2:end) .^ 2)) + sum(sum(Theta2(:, 2:end) .^ 2))) / (2 * m);
 
+% Gradient
+for t = 1:m
+    % For each training sample
+    d3 = zeros(1, num_labels);
+    for k = 1:num_labels
+        yk = y(t) == k;
+        d3(k) = h(t, k) - yk;
+    end
+    d2 = Theta2' * d3' .* sigmoidGradient([1, z2(t, :)])';
+    d2 = d2(2:end);
+    Theta1_grad = Theta1_grad + d2 * a1(t, :);
+    Theta2_grad = Theta2_grad + d3' * a2(t, :);
+end
+Theta1_grad = Theta1_grad / m;
+Theta2_grad = Theta2_grad / m;
+Theta1_grad(:, 2:end) = Theta1_grad(:, 2:end) + lambda * Theta1(:, 2:end) / m;
+Theta2_grad(:, 2:end) = Theta2_grad(:, 2:end) + lambda * Theta2(:, 2:end) / m;
 
 
 
