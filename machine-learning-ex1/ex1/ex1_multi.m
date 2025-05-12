@@ -79,6 +79,20 @@ X = [ones(m, 1) X];
 % Hint: At prediction, make sure you do the same feature normalization.
 %
 
+% Begin: My code plotting for different learning rates
+alphas = [0.3 0.1 0.03 0.01];
+colors = ['r', 'g', 'b', 'k'];
+short_iters = 50;
+figure;
+hold on;
+xlabel('Number of iterations');
+ylabel('Cost J');
+for i = 1:length(alphas)
+    [~, J] = gradientDescentMulti(X, y, zeros(3, 1), alphas(i), short_iters);
+    plot(1:numel(J), J, colors(i), 'LineWidth', 2);
+end
+% End: My code plotting for different learning rates
+
 fprintf('Running gradient descent ...\n');
 
 % Choose some alpha value
@@ -104,8 +118,9 @@ fprintf('\n');
 % ====================== YOUR CODE HERE ======================
 % Recall that the first column of X is all-ones. Thus, it does
 % not need to be normalized.
-price = 0; % You should change this
+%price = 0; % You should change this
 
+price = [1, ([1650, 3] - mu) ./ sigma] * theta;
 
 % ============================================================
 
@@ -149,7 +164,7 @@ fprintf('\n');
 
 % Estimate the price of a 1650 sq-ft, 3 br house
 % ====================== YOUR CODE HERE ======================
-price = 0; % You should change this
+price = [1, 1650, 3] * theta; % You should change this
 
 
 % ============================================================
