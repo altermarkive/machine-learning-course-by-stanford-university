@@ -9,98 +9,10 @@ import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d
 import sklearn.linear_model as linear_model
 
-
-def warmUpExercise():
-    #WARMUPEXERCISE Example function in octave
-    #   A = WARMUPEXERCISE() is an example function that returns the 5x5 identity matrix
-
-    #A = [];
-    # ============= YOUR CODE HERE ==============
-    # Instructions: Return the 5x5 identity matrix
-    #               In octave, we return values by defining which variables
-    #               represent the return values (at the top of the file)
-    #               and then set them accordingly.
-
-    A = np.eye(5)
-
-    # ===========================================
-
-    return A
-
-def plotData(x, y):
-    #PLOTDATA Plots the data points x and y into a new figure
-    #   PLOTDATA(x,y) plots the data points and gives the figure axes labels of
-    #   population and profit.
-
-    # ====================== YOUR CODE HERE ======================
-    # Instructions: Plot the training data into a figure using the
-    #               "figure" and "plot" commands. Set the axes labels using
-    #               the "xlabel" and "ylabel" commands. Assume the
-    #               population and revenue data have been passed in
-    #               as the x and y arguments of this function.
-    #
-    # Hint: You can use the 'rx' option with plot to have the markers
-    #       appear as red crosses. Furthermore, you can make the
-    #       markers larger by using plot(..., 'rx', 'MarkerSize', 10);
-
-    #figure; % open a new figure window
-
-    plt.plot(x, y, 'rx', markersize=10)
-    plt.ylabel('Profit in $10,000s')
-    plt.xlabel('Population of City in 10,000s')
-    plt.savefig('figure1.png')
-
-    # ============================================================
-
-def computeCost(X, y, theta):
-    #COMPUTECOST Compute cost for linear regression
-    #   J = COMPUTECOST(X, y, theta) computes the cost of using theta as the
-    #   parameter for linear regression to fit the data points in X and y
-
-    # Initialize some useful values
-    #m = y.shape[1] # number of training examples
-
-    # You need to return the following variables correctly
-    #J = 0;
-
-    # ====================== YOUR CODE HERE ======================
-    # Instructions: Compute the cost of a particular choice of theta
-    #               You should set J to the cost.
-
-    J = np.sum(np.power(np.subtract(np.dot(X, theta), y), 2.0)) / (2 * X.shape[0])
-
-    # =========================================================================
-
-    return J
-
-def gradientDescent(X, y, theta, alpha, num_iters):
-    #GRADIENTDESCENT Performs gradient descent to learn theta
-    #   theta = GRADIENTDESENT(X, y, theta, alpha, num_iters) updates theta by
-    #   taking num_iters gradient steps with learning rate alpha
-
-    # Initialize some useful values
-    m = y.shape[0] # number of training examples
-    J_history = np.reshape(np.zeros((num_iters, 1)), (num_iters, 1))
-
-    for i in range(num_iters):
-
-        # ====================== YOUR CODE HERE ======================
-        # Instructions: Perform a single gradient step on the parameter vector
-        #               theta.
-        #
-        # Hint: While debugging, it can be useful to print out the values
-        #       of the cost function (computeCost) and gradient here.
-        #
-
-        theta = np.subtract(theta, (alpha / m) * np.dot(np.subtract(np.dot(X, theta), y).T, X).T)
-
-        # ============================================================
-
-        # Save the cost J in every iteration
-        J_history[i, 0] = computeCost(X, y, theta)
-
-    return (theta, J_history)
-
+from warmUpExercise import warmUpExercise
+from plotData import plotData
+from computeCost import computeCost
+from gradientDescent import gradientDescent
 
 # Machine Learning Online Class - Exercise 1: Linear Regression
 #
@@ -239,6 +151,3 @@ def ex1():
     plt.plot(X, model.predict(X), '-')
     plt.legend(['Training data', 'Linear regression'])
     plt.savefig('figure2.sklearn.png')
-
-if __name__ == "__main__":
-    ex1()

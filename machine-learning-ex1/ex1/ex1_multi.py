@@ -2,123 +2,15 @@
 
 import numpy as np
 import matplotlib
-import matplotlib.cm as cm
 # Force matplotlib to not use any X Windows backend (must be called befor importing pyplot)
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d
 import sklearn.linear_model as linear_model
 import sklearn.metrics as metrics
 
-def featureNormalize(X):
-    #FEATURENORMALIZE Normalizes the features in X
-    #   FEATURENORMALIZE(X) returns a normalized version of X where
-    #   the mean value of each feature is 0 and the standard deviation
-    #   is 1. This is often a good preprocessing step to do when
-    #   working with learning algorithms.
-
-    # You need to set these values correctly
-    #X_norm = X;
-    #mu = zeros(1, size(X, 2));
-    #sigma = zeros(1, size(X, 2));
-
-    # ====================== YOUR CODE HERE ======================
-    # Instructions: First, for each feature dimension, compute the mean
-    #               of the feature and subtract it from the dataset,
-    #               storing the mean value in mu. Next, compute the
-    #               standard deviation of each feature and divide
-    #               each feature by it's standard deviation, storing
-    #               the standard deviation in sigma.
-    #
-    #               Note that X is a matrix where each column is a
-    #               feature and each row is an example. You need
-    #               to perform the normalization separately for
-    #               each feature.
-    #
-    # Hint: You might find the 'mean' and 'std' functions useful.
-    #
-
-    mu = np.mean(X, axis=0)
-    sigma = np.std(X, ddof=1, axis=0)
-    X_norm = np.c_[(X[:, 0] - mu[0]) / sigma[0], (X[:, 1] - mu[1]) / sigma[1]]
-
-    # ============================================================
-
-    return (X_norm, mu, sigma)
-
-
-def computeCostMulti(X, y, theta):
-    #COMPUTECOSTMULTI Compute cost for linear regression with multiple variables
-    #   J = COMPUTECOSTMULTI(X, y, theta) computes the cost of using theta as the
-    #   parameter for linear regression to fit the data points in X and y
-
-    # Initialize some useful values
-    m = X.shape[0] # number of training examples
-
-    # You need to return the following variables correctly
-    #J = 0;
-
-    # ====================== YOUR CODE HERE ======================
-    # Instructions: Compute the cost of a particular choice of theta
-    #               You should set J to the cost.
-
-    J = np.sum(np.power(np.subtract(np.dot(X, theta), y), 2.0)) / (2 * m)
-
-    # =========================================================================
-
-    return J
-
-
-def gradientDescentMulti(X, y, theta, alpha, num_iters):
-    #GRADIENTDESCENTMULTI Performs gradient descent to learn theta
-    #   theta = GRADIENTDESCENTMULTI(x, y, theta, alpha, num_iters) updates theta by
-    #   taking num_iters gradient steps with learning rate alpha
-
-    # Initialize some useful values
-    m = y.shape[0] # number of training examples
-    J_history = np.reshape(np.zeros((num_iters, 1)), (num_iters, 1))
-
-    for i in range(num_iters):
-
-        # ====================== YOUR CODE HERE ======================
-        # Instructions: Perform a single gradient step on the parameter vector
-        #               theta.
-        #
-        # Hint: While debugging, it can be useful to print out the values
-        #       of the cost function (computeCostMulti) and gradient here.
-        #
-
-        theta = np.subtract(theta, (alpha / m) * np.dot(np.subtract(np.dot(X, theta), y).T, X).T)
-
-        # ============================================================
-
-        # Save the cost J in every iteration
-        J_history[i, 0] = computeCostMulti(X, y, theta)
-
-    return (theta, J_history)
-
-
-def normalEqn(X, y):
-    #NORMALEQN Computes the closed-form solution to linear regression
-    #   NORMALEQN(X,y) computes the closed-form solution to linear
-    #   regression using the normal equations.
-
-    #theta = zeros(size(X, 2), 1);
-
-    # ====================== YOUR CODE HERE ======================
-    # Instructions: Complete the code to compute the closed form solution
-    #               to linear regression and put the result in theta.
-    #
-
-    # ---------------------- Sample Solution ----------------------
-
-    theta = np.dot(np.dot(np.linalg.pinv(np.dot(X.T, X)), X.T), y)
-
-    # -------------------------------------------------------------
-
-    # ============================================================
-
-    return theta
+from featureNormalize import featureNormalize
+from gradientDescentMulti import gradientDescentMulti
+from normalEqn import normalEqn
 
 
 # Machine Learning Online Class
@@ -325,6 +217,3 @@ def ex1_multi():
     print('Theta found: ')
     print('%f %f %f' % (model.intercept_[0], model.coef_[0, 0], model.coef_[0, 1]))
     print('Predicted price of a 1650 sq-ft, 3 br house (using sklearn):\n $%f' % model.predict([[1650, 3]]))
-
-if __name__ == "__main__":
-    ex1_multi()
