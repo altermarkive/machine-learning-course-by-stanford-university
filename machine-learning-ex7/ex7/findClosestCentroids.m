@@ -21,6 +21,11 @@ idx = zeros(size(X,1), 1);
 % Note: You can use a for-loop over the examples to compute this.
 %
 
+k_ones = ones(K, 1);
+for i = 1:size(X, 1)
+    [~, index] = min(sum((k_ones * X(i, :) - centroids) .^ 2, 2));
+    idx(i) = index;
+end
 
 
 
