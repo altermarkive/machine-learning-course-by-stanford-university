@@ -17,6 +17,7 @@ neg = find(y == 0);
 
 plot(X(pos, 1), X(pos, 2), 'k+', 'Linewidth', 2, 'MarkerSize', 7);
 plot(X(neg, 1), X(neg, 2), 'ko', 'MarkerFaceColor', 'y', 'MarkerSize', 7);
+saveas(gcf,'figure1.jpg')
 
 
 
